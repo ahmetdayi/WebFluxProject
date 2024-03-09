@@ -105,7 +105,7 @@ public class EmployerHandler {
     //endregion
 
     public Mono<ServerResponse> findById(ServerRequest request){
-        //TODO pathvariableden aldigin id string gelmesi lazim
+
         String id = request.pathVariable("id");
         Mono<EmployerResponse> employerResponseMono = employerConverter.convertToMono(findByIdMono(id));
         return ServerResponse
