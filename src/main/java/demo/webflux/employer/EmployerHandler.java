@@ -1,5 +1,6 @@
 package demo.webflux.employer;
 
+import demo.webflux.employee.EmployeeHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ public class EmployerHandler {
 
     private final EmployerRepository employerRepository;
     private final EmployerConverter employerConverter;
+    private final EmployeeHandler employeeHandler;
 
     //region Different Create Method
     public Mono<ServerResponse> createWithResponse(ServerRequest request) {
@@ -31,7 +33,7 @@ public class EmployerHandler {
 
     /*
      * void method for create
-     *
+     *void olarak donulmuyor
      * */
     public Mono<Void> createWithoutResponse(ServerRequest request) {
 
@@ -62,14 +64,30 @@ public class EmployerHandler {
                 .flatMap(updateEmployerRequest -> {
                     String employerId = updateEmployerRequest.id().toString();
                     return findByIdMono(employerId)
-                            .flatMap(employer -> updateEmployerName(employer, updateEmployerRequest));
+                            .flatMap(employer -> setName(employer, updateEmployerRequest));
                 })
                 .then(ServerResponse.status(HttpStatus.CREATED).build());
     }
 
-    private Mono<Employer> updateEmployerName(Employer employer, UpdateEmployerRequest uRequest) {
+    private Mono<Employer> setName(Employer employer, UpdateEmployerRequest uRequest) {
         employer.setName(uRequest.name().trim().isEmpty() ? employer.getName() : uRequest.name());
         return employerRepository.save(employer);
+    }
+
+    public Mono<ServerResponse> addEmployee(ServerRequest request) {
+        Mono<AddEmployeeRequest> addEmployeeRequestMono = request.bodyToMono(AddEmployeeRequest.class);
+
+        return addEmployeeRequestMono.flatMap(addEmployeeRequest ->
+                findByIdMono(addEmployeeRequest.employerId().toString())
+                        .flatMap(employer ->
+                                employeeHandler.findExistIdInIdList(addEmployeeRequest.employeeIdList())
+                                        .flatMap(idList -> {
+                                            employer.getEmployeeIdList().addAll(idList);
+                                            return employerRepository.save(employer);
+                                        })
+                                        .flatMap(updatedEmployer -> ServerResponse.ok().build())
+                        )
+        );
     }
     //endregion
 
@@ -94,17 +112,17 @@ public class EmployerHandler {
                 .body(employerResponseMono, EmployerResponse.class);
         };
 
-    public Mono<Void> deleteById(ServerRequest request) {
+    public Mono<ServerResponse> deleteById(ServerRequest request) {
         String id = request.pathVariable("id");
         return findByIdMono(id)
                 .flatMap(employerRepository::delete)
-                .then(ServerResponse.status(HttpStatus.OK).build()).then();
+                .then(ServerResponse.status(HttpStatus.OK).build());
     }
 
     private Mono<Employer> findByIdMono(String id) {
         return employerRepository.
                 findById(UUID.fromString(id))
-                .switchIfEmpty(Mono.error(new EmployerNotFoundException(Constant.EMPLOYER_NOT_FOUND)));
+                .switchIfEmpty(Mono.error(new EmployerNotFoundException(ExceptionConstant.EMPLOYER_NOT_FOUND)));
     }
 
 

@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-public class EmployerDescriptionMetadata {
+public class EmployerDescriptionMetadata extends DescriptionMetadata{
 
     private Integer employeeCount;
 

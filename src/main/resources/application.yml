@@ -14,10 +14,11 @@ webflux:
 spring:
   flyway:
     enabled: true
-    url: jdbc:postgresql://127.0.0.1:5435/webfluxdb
+    url: jdbc:postgresql://127.0.0.1:5432/webfluxdb
     user: user
     password: pwd
     baseline-version: 0
+
 
 server:
   port: 8081

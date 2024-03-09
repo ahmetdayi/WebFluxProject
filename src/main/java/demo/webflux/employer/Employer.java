@@ -7,9 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +28,8 @@ public class Employer implements Serializable, Persistable<UUID> {
 
     private DescriptionMetadata descriptionMetadata;
 
-    private List<String> employeeIdList;
+    @Column("employee_id_list")
+    private List<String> employeeIdList = new ArrayList<>();
 
     @Transient
     private boolean isUpdated = false;
@@ -40,6 +43,12 @@ public class Employer implements Serializable, Persistable<UUID> {
     }
 
     public Employer(String name, DescriptionMetadata descriptionMetadata) {
+        this.name = name;
+        this.descriptionMetadata = descriptionMetadata;
+    }
+
+    public Employer(UUID id, String name, DescriptionMetadata descriptionMetadata) {
+        this.id = id;
         this.name = name;
         this.descriptionMetadata = descriptionMetadata;
     }
