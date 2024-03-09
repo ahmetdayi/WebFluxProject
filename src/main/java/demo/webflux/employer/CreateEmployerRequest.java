@@ -1,9 +1,10 @@
 package demo.webflux.employer;
 
-import demo.webflux.metadata.DescriptionMetadata;
+import demo.webflux.metadata.EmployerDescriptionMetadata;
 
 public record CreateEmployerRequest(
+
         String name,
-        DescriptionMetadata descriptionMetadata
+        EmployerDescriptionMetadata employerDescriptionMetadata
 ) {
 }

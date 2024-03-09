@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -22,7 +23,8 @@ import java.util.UUID;
 @Table(name = "employer")
 public class Employer implements Serializable, Persistable<UUID> {
 
-    private UUID id;
+    @Id
+    private UUID id ;
 
     private String name;
 
@@ -46,6 +48,15 @@ public class Employer implements Serializable, Persistable<UUID> {
         this.name = name;
         this.descriptionMetadata = descriptionMetadata;
     }
+
+    //Otomatik id uretemiyor
+    public Employer(UUID id , String name, DescriptionMetadata descriptionMetadata, boolean isUpdated) {
+        this.name = name;
+        this.descriptionMetadata = descriptionMetadata;
+        this.isUpdated = isUpdated;
+        this.id = id;
+    }
+
 
     public Employer(UUID id, String name, DescriptionMetadata descriptionMetadata) {
         this.id = id;

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Table(name = "employee")
 public class Employee implements Persistable<UUID>, Serializable {
 
+    @Id
     private UUID id;
 
     private String name;
@@ -36,4 +38,6 @@ public class Employee implements Persistable<UUID>, Serializable {
     public boolean isNew() {
         return !this.isUpdated || id == null;
     }
+
+
 }

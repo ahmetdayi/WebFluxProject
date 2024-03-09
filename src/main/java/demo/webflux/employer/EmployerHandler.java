@@ -25,7 +25,7 @@ public class EmployerHandler {
         Mono<CreateEmployerRequest> createEmployerRequestMono = request.bodyToMono(CreateEmployerRequest.class);
         Mono<Employer> savedEmployer = createEmployerRequestMono
                 .flatMap(request1 -> employerRepository
-                        .save(new Employer(request1.name(), request1.descriptionMetadata())));
+                        .save(new Employer(UUID.randomUUID(),request1.name(), request1.employerDescriptionMetadata(),false)));
 
         return ServerResponse.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(savedEmployer, Employer.class);
     }
@@ -38,7 +38,7 @@ public class EmployerHandler {
     public Mono<Void> createWithoutResponse(ServerRequest request) {
 
         return request.bodyToMono(CreateEmployerRequest.class)
-                .flatMap(request1 -> employerRepository.save(new Employer(request1.name(), request1.descriptionMetadata())))
+                .flatMap(request1 -> employerRepository.save(new Employer(UUID.randomUUID(),request1.name(), request1.employerDescriptionMetadata(),false)))
                 .then(ServerResponse.status(HttpStatus.CREATED).build()).then();
     }
 
@@ -48,7 +48,7 @@ public class EmployerHandler {
     public Mono<ServerResponse> createWithEmptyResponse(ServerRequest request) {
         return request.bodyToMono(CreateEmployerRequest.class)
                 .flatMap(request1 -> employerRepository
-                        .save(new Employer(request1.name(), request1.descriptionMetadata())))
+                        .save(new Employer(UUID.randomUUID(),request1.name(), request1.employerDescriptionMetadata(),false)))
                 .then(ServerResponse.status(HttpStatus.CREATED).build());
     }
     //endregion
@@ -71,6 +71,7 @@ public class EmployerHandler {
 
     private Mono<Employer> setName(Employer employer, UpdateEmployerRequest uRequest) {
         employer.setName(uRequest.name().trim().isEmpty() ? employer.getName() : uRequest.name());
+        employer.setUpdated(true);
         return employerRepository.save(employer);
     }
 
@@ -83,6 +84,7 @@ public class EmployerHandler {
                                 employeeHandler.findExistIdInIdList(addEmployeeRequest.employeeIdList())
                                         .flatMap(idList -> {
                                             employer.getEmployeeIdList().addAll(idList);
+                                            employer.setUpdated(true);
                                             return employerRepository.save(employer);
                                         })
                                         .flatMap(updatedEmployer -> ServerResponse.ok().build())
@@ -110,7 +112,7 @@ public class EmployerHandler {
                 .status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(employerResponseMono, EmployerResponse.class);
-        };
+        }
 
     public Mono<ServerResponse> deleteById(ServerRequest request) {
         String id = request.pathVariable("id");
