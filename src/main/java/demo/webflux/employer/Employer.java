@@ -10,6 +10,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -25,6 +26,8 @@ public class Employer implements Serializable, Persistable<UUID> {
 
     private DescriptionMetadata descriptionMetadata;
 
+    private List<String> employeeIdList;
+
     @Transient
     private boolean isUpdated = false;
     @Override
@@ -34,5 +37,10 @@ public class Employer implements Serializable, Persistable<UUID> {
     @Override
     public boolean isNew() {
         return !this.isUpdated || id == null;
+    }
+
+    public Employer(String name, DescriptionMetadata descriptionMetadata) {
+        this.name = name;
+        this.descriptionMetadata = descriptionMetadata;
     }
 }
